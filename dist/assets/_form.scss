@@ -1,0 +1,70 @@
+@import "variables";
+
+.container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 50px 20px;
+  box-sizing: border-box;
+  background-color: $bg-color;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+  color: $primary-text-color;
+}
+
+.form-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    color: $secondary-text-color;
+  }
+
+  input {
+    display: block;
+    width: 100%;
+    height: 40px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    font-size: 16px;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    background-color: white;
+    color: $primary-text-color;
+    transition: border-color 0.3s;
+
+    &:focus {
+      border-color: $primary-color;
+      outline: none;
+    }
+  }
+}
+
+button[type="submit"] {
+  display: block;
+  width: 100%;
+  height: 40px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  background-color: $primary-color;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: darken($primary-color, 5%);
+  }
+}
