@@ -24,6 +24,20 @@ const UserSchema = new Schema({
     ],
   },
   password: { type: String, required: true },
+  profilePhoto: String,
+  googleId: {
+    type: String,
+    default: null,
+  },
+  firstName: {
+    type: String,
+    default: null,
+  },
+  lastName: {
+    type: String,
+    default: null,
+  },
+
   role: {
     type: String,
     enum: ["basicUser", "premiumUser", "admin"],

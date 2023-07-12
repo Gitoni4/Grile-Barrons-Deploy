@@ -62,3 +62,8 @@ exports.updatePassword = async (req, res) => {
 
   res.send({ message: "Password updated successfully" });
 };
+
+exports.registerGoogle = ({id, email, firstName, lastName, profilePhoto}) => {
+  const user = new User({id, email, firstName, lastName, profilePhoto, source: "google",})
+  return user.save()
+}

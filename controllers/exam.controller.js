@@ -335,37 +335,53 @@ exports.createDailyExam = async (req, res) => {
 
   const examQuestions = [];
 
-  for (let i = 0; i < chapters.length; i++) {
-    const easyQuestion = await Question.findOne({
-      chapter: chapters[i],
+  const randChapters = Array(10)
+    .fill()
+    .map(() => 27 * Math.random());
+  const fetchDaily = await DailyExam.find();
+  const latestDailyExam = fetchDaily[fetchDaily.length - 1];    
+  const examDailyRef = await Exam.findById(latestDailyExam.exam)  
+  const questionsJSON = latestDailyExam.toJSON()["questions"];
+  let latestDailyExamQuestions = []
+  questionsJSON.forEach(async question =>  {       
+    latestDailyExamQuestions.push(question)
+  })  
+
+  let check = 0;
+
+  for (let i = 0; i < 5; i++) {
+    const fetchEasyQuestion = await Question.find({
+      chapter: chapters[randChapters[i]],
       difficulty: "easy",
-    }).sort(() => Math.random() - 0.5);
-    const hardQuestion = await Question.findOne({
-      chapter: chapters[i],
+    });
+    const easyQuestion =
+      fetchEasyQuestion[fetchEasyQuestion.length * Math.random() - 1];
+    const fetchHardQuestion = await Question.findOne({
+      chapter: chapters[randChapters[i + 5]],
       difficulty: "hard",
-    }).sort(() => Math.random() - 0.5);
-    if (easyQuestion) examQuestions.push(easyQuestion);
-    if (hardQuestion) examQuestions.push(hardQuestion);
-    if (examQuestions.length >= 10) break;
+    });
+    const hardQuestion =
+      fetchHardQuestion[fetchHardQuestion.length * Math.random() - 1];
+    if (latestDailyExamQuestions.includes(easyQuestion._id) && check < 2) {
+      examQuestions.push(easyQuestion);
+      check++;
+    } else {
+      i--;
+    }
+    if (latestDailyExamQuestions.includes(hardQuestion._id) && check < 2) {
+      examQuestions.push(hardQuestion);
+      check++;
+    } else {
+      i--;
+    }
+    if (!latestDailyExamQuestions.includes(easyQuestion._id))
+      examQuestions.push(easyQuestion);
+    if (!latestDailyExamQuestions.includes(hardQuestion._id))
+      examQuestions.push(hardQuestion);
   }
 
-  const newExam = new Exam({
-    questions: examQuestions,
-    examType: "daily",
-    totalQuestions: examQuestions.length,
-    difficulty: "both",
-  });
-  await newExam.save();
-
-  const newDailyExam = new DailyExam({ exam: newExam._id });
-  await newDailyExam.save();
-
-  res.json({
-    success: true,
-    message: "Daily Exam Created",
-    exam: newDailyExam,
-  });
-};
+  console.log(examQuestions)
+}
 
 exports.uploadQuestions = (req, res) => {
   try {
@@ -448,6 +464,39 @@ exports.getDailyUserExam = async (req, res) => {
     });
   }
 };
+
+exports.getExamHistory = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const exams = await Exam.find({ creator: userId }).populate("questions").exec()
+
+    if (!exams) {
+      return res.status(404).json({
+        success: false,
+        message: "Exam not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      exams,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching the exam",
+      error: error.message,
+    });
+  }
+}
 
 const processRowsAndSaveQuestions = async (rows) => {
   for (let i = 1; i < rows.length; i++) {

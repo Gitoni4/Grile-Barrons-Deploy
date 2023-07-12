@@ -5,7 +5,8 @@ const Schema = mongoose.Schema;
 
 const DailyExamSchema = new Schema(
   {
-    exam: { type: Schema.Types.ObjectId, ref: "Exam" },
+    questions: [{ type: Schema.Types.ObjectId, ref: "Question" }],
+    isCompleted: { type: Boolean, default: false },
     date: { type: Date, default: Date.now },
   },
   { timestamps: true }
